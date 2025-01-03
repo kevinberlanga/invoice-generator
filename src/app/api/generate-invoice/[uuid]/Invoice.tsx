@@ -119,10 +119,10 @@ const styles = StyleSheet.create({
   },
   headerSecondSubtitle: {
     fontFamily: "Helvetica-Bold",
-    fontSize: 12,
+    fontSize: 11,
   },
   invoiceText: {
-    fontSize: 12,
+    fontSize: 11,
   },
   invoiceTableDetailsSection: {
     display: "flex",
@@ -161,9 +161,9 @@ const styles = StyleSheet.create({
     display: "flex",
     justifyContent: "center",
     fontFamily: "Helvetica-Bold",
-    fontSize: 14,
+    fontSize: 11,
     height: 30,
-    backgroundColor: "lightgray",
+    borderBottom: "1px solid lightgray"
   },
   invoiceTableNumericalContent: {
     display: "flex",
@@ -177,7 +177,7 @@ const styles = StyleSheet.create({
     objectFit: "contain",
   },
   footer: {
-    fontSize: 12,
+    fontSize: 11,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
