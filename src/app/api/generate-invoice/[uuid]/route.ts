@@ -83,12 +83,20 @@ export async function GET(
       };
     });
 
-  const nodejsStream = await ReactPDF.renderToStream(
+  const stream = await ReactPDF.renderToStream(
     React.createElement(Invoice, { data: itemData })
   );
 
+  return new NextResponse(toWebStream(stream), {
+    headers: {
+      "Content-Type": "application/pdf",
+      "Content-Disposition": `inline; filename="invoice-${uuid}.pdf"`,
+    },
+  });
+}
 
-  const stream = new ReadableStream({
+function toWebStream(nodejsStream: NodeJS.ReadableStream): ReadableStream {
+  return new ReadableStream({
     start(controller) {
       nodejsStream.on('data', (chunk) => {
         controller.enqueue(chunk);
@@ -101,14 +109,6 @@ export async function GET(
       nodejsStream.on('error', (err) => {
         controller.error(err);
       });
-    },
-  });
-
-  return new NextResponse(stream, {
-    headers: {
-      "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="invoice-${uuid}.pdf"`,
-      "Transfer-Encoding": "chunked",
     },
   });
 }

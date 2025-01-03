@@ -10,6 +10,7 @@ import {
   Svg,
   Path,
 } from "@react-pdf/renderer";
+import sharp from "sharp";
 
 export type ItemData = {
   listingId: string;
@@ -347,7 +348,7 @@ const Invoice = ({ data, ...props }: { data: ItemData } & DocumentProps) => {
                 </View>
                 <View style={{ ...styles.flexRowContainer, columnGap: 10 }}>
                   <View style={styles.invoiceTableListingImageContainer}>
-                    <Image src={listingImage} />
+                    <Image src={resize(listingImage, { width: 100, height: 100 })} />
                   </View>
                   <View style={{ ...styles.flexColumnContainer, rowGap: 10 }}>
                     <Text style={{ fontFamily: "Helvetica-Bold" }}>
@@ -466,3 +467,17 @@ const Invoice = ({ data, ...props }: { data: ItemData } & DocumentProps) => {
 };
 
 export default Invoice;
+
+function resize(url: string, { width, height }: { width: number, height: number }): () => Promise<Buffer> {
+  return async () => {
+    const imageResponse = await fetch(url);
+    const imageBuffer = await imageResponse.arrayBuffer();
+    return await sharp(Buffer.from(imageBuffer))
+      .resize(width * 2, height * 2, {
+        fit: "contain",
+        position: "top",
+        background: "white"
+      })
+      .toBuffer();
+  }
+}
