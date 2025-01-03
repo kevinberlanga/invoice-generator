@@ -87,19 +87,25 @@ export async function GET(
 
   const newstream = new ReadableStream({
     start(controller) {
-      // convert nodejsStream into a readable stream
-      nodejsStream.on("data", (chunk) => {
+      nodejsStream.on('data', (chunk) => {
         controller.enqueue(chunk);
       });
-      nodejsStream.on("end", () => {
+      
+      nodejsStream.on('end', () => {
         controller.close();
       });
-    },
+
+      nodejsStream.on('error', (err) => {
+        controller.error(err);
+      });
+    }
   });
 
   return new NextResponse(newstream, {
     headers: {
       "Content-Type": "application/pdf",
+      "Content-Disposition": "inline",
+      "Transfer-Encoding": "chunked",
     },
   });
 }
