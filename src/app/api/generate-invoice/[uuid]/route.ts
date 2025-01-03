@@ -90,7 +90,7 @@ export async function GET(
   return new NextResponse(toWebStream(stream), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="invoice-${uuid}.pdf"`,
+      "Content-Disposition": `attachment; filename="invoice-${uuid}.pdf"`,
     },
   });
 }
