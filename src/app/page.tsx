@@ -23,7 +23,7 @@ export default function Home() {
         </div>
       </main>
       <footer className="flex gap-6 flex-wrap items-center justify-center">
-        <p>Browse Listings</p>
+        <a href="https://www.withgarage.com/search">Browse Listings</a>
       </footer>
     </div>
   );

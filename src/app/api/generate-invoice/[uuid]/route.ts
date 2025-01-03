@@ -5,10 +5,10 @@ import Invoice, { ItemData } from "./Invoice";
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: { uuid: string } }
+  { params }: { params: Promise<{ uuid: string }> }
 ): Promise<NextResponse> {
-  const { uuid } = params;
-
+  const { uuid } = await params;
+  console.log("uuid", uuid);
   const uuidRegex = /^[0-9a-fA-F-]{36}$/;
   if (!uuidRegex.test(uuid)) {
     return new NextResponse(JSON.stringify({ error: "Invalid UUID format" }), {
@@ -17,23 +17,30 @@ export async function GET(
     });
   }
 
-  const itemData: ItemData = await fetch(`https://garage-backend.onrender`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      id: uuid,
-    }),
-  })
+  const itemData: ItemData = await fetch(
+    `https://garage-backend.onrender.com/getListing`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: uuid,
+      }),
+    }
+  )
     .then((res) => res.json())
     .then((data) => {
+      console.log('listing data', data?.result?.listing);
       const {
+        id,
         listingTitle,
         sellingPrice,
         itemBrand,
         listingDescription,
         itemAge,
+        imageUrls,
+        isAuction,
         addressPrimary,
         addressSecondary,
         addressCity,
@@ -49,11 +56,15 @@ export async function GET(
       } = data?.result?.listing;
       return {
         user,
+        listingId: id,
         listingTitle,
         sellingPrice,
         itemBrand,
         listingDescription,
         itemAge,
+        isAuction,
+        listingImage: imageUrls[0],
+        dateRequested: new Date(),
         address: {
           primary: addressPrimary,
           secondary: addressSecondary,

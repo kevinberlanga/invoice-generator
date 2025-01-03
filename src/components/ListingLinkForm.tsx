@@ -3,7 +3,6 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -14,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
+import { Button } from "./ui/button";
 
 const formSchema = z.object({
   url: z
@@ -34,31 +33,32 @@ const formSchema = z.object({
         message: "Please provide a valid listing url.",
       }
     ),
-  email: z
-    .string()
-    .email({
-      message: "Please provide a valid email address.",
-    })
 });
 
 export function ListingLinkForm() {
-  const [willSendEmail, setWillSendEmail] = useState(false);
-  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       url: "",
-      email: "",
     },
   });
 
-  const onSubmit = (values: z.infer<typeof formSchema>) => {
-    console.log(values);
+  const onSubmit = () => {
+    const uuid = extractUuidFromUrl(form.getValues().url);
+    const href = `/api/generate-invoice/${uuid}`;
+
+    // download as invoice.pdf
+    const a = document.createElement("a");
+    a.href = href;
+    a.download = `invoice-${uuid}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-4">
+      <form className="w-full space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
         <FormField
           control={form.control}
           name="url"
@@ -79,37 +79,10 @@ export function ListingLinkForm() {
             </FormItem>
           )}
         />
-        {willSendEmail && <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Enter email recipient..."
-                  {...field}
-                  className="w-full"
-                />
-              </FormControl>
-              <FormDescription>
-                This is the email recipient for the PDF.
-              </FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />}
         <div className="flex flex-row justify-center items-center">
-          {willSendEmail ? (
-            <Button type="submit">
-              Send Email
-            </Button>
-          ) : (
-            <Button onClick={() => setWillSendEmail(true)}>
-              Email PDF
-            </Button>
-          ) }
-          <a href={`/api/generate-invoice/${extractUuidFromUrl(form.getValues().url)}`} download>Download PDF</a>
+          <Button disabled={!!form.formState.errors.url} type="submit">
+            Request PDF Invoice
+          </Button>
         </div>
       </form>
     </Form>
@@ -117,7 +90,9 @@ export function ListingLinkForm() {
 }
 
 function extractUuidFromUrl(url: string): string {
-  const regex = /(?:https?:\/\/)?(?:www\.)?withgarage\.com\/listing\/.*?-([a-f0-9\-]{36})/i;
+  const regex =
+    /(?:https?:\/\/)?(?:www\.)?withgarage\.com\/listing\/.*?-([a-f0-9\-]{36})/i;
   const match = url.match(regex);
-  return match ? match[1] : '';
+  if (match) console.log("match", match[1]);
+  return match ? match[1] : "";
 }
