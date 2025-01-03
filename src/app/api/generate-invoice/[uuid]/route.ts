@@ -3,6 +3,8 @@ import ReactPDF from "@react-pdf/renderer";
 import React from "react";
 import Invoice, { ItemData } from "./Invoice";
 
+export const maxDuration = 60;
+
 export async function GET(
   _req: NextRequest,
   { params }: { params: Promise<{ uuid: string }> }
@@ -85,6 +87,7 @@ export async function GET(
     React.createElement(Invoice, { data: itemData })
   );
 
+
   const stream = new ReadableStream({
     start(controller) {
       nodejsStream.on('data', (chunk) => {
@@ -98,7 +101,7 @@ export async function GET(
       nodejsStream.on('error', (err) => {
         controller.error(err);
       });
-    }
+    },
   });
 
   return new NextResponse(stream, {
