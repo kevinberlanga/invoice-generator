@@ -217,7 +217,7 @@ const Invoice = ({ data, ...props }: { data: ItemData } & DocumentProps) => {
     hasRust,
     tankSize,
     pumpSize,
-    finalPrice
+    finalPrice,
   );
   return (
     <Document {...props}>
@@ -348,7 +348,9 @@ const Invoice = ({ data, ...props }: { data: ItemData } & DocumentProps) => {
                 </View>
                 <View style={{ ...styles.flexRowContainer, columnGap: 10 }}>
                   <View style={styles.invoiceTableListingImageContainer}>
-                    <Image src={resize(listingImage, { width: 100, height: 100 })} />
+                    <Image
+                      src={resize(listingImage, { width: 100, height: 100 })}
+                    />
                   </View>
                   <View style={{ ...styles.flexColumnContainer, rowGap: 10 }}>
                     <Text style={{ fontFamily: "Helvetica-Bold" }}>
@@ -361,7 +363,9 @@ const Invoice = ({ data, ...props }: { data: ItemData } & DocumentProps) => {
                         Seller description:
                       </Text>
                       <Text style={{ maxWidth: 350 }}>
-                        {listingDescription.length > 400 ? `${listingDescription.slice(0, 400)}...` : listingDescription}
+                        {listingDescription.length > 400
+                          ? `${listingDescription.slice(0, 400)}...`
+                          : listingDescription}
                       </Text>
                     </View>
                     <View style={{ ...styles.flexColumnContainer, rowGap: 6 }}>
@@ -468,16 +472,22 @@ const Invoice = ({ data, ...props }: { data: ItemData } & DocumentProps) => {
 
 export default Invoice;
 
-function resize(url: string, { width, height }: { width: number, height: number }): () => Promise<Buffer> {
+function resize(
+  url: string,
+  { width, height }: { width: number; height: number },
+): () => Promise<Buffer> {
   return async () => {
-    const imageResponse = await fetch(url);
+    const imageResponse = await fetch(
+      url + "?width=3840&quality=75&resize=contain",
+    );
     const imageBuffer = await imageResponse.arrayBuffer();
     return await sharp(Buffer.from(imageBuffer))
+      // multiply size by 2 to support better visual rendering on retina displays
       .resize(width * 2, height * 2, {
         fit: "contain",
         position: "top",
-        background: "white"
+        background: "white",
       })
       .toBuffer();
-  }
+  };
 }

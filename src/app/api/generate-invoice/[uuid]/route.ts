@@ -7,7 +7,7 @@ export const maxDuration = 60;
 
 export async function GET(
   _req: NextRequest,
-  { params }: { params: Promise<{ uuid: string }> }
+  { params }: { params: Promise<{ uuid: string }> },
 ): Promise<NextResponse> {
   const { uuid } = await params;
   console.log("uuid", uuid);
@@ -29,11 +29,11 @@ export async function GET(
       body: JSON.stringify({
         id: uuid,
       }),
-    }
+    },
   )
     .then((res) => res.json())
     .then((data) => {
-      console.log('listing data', data?.result?.listing);
+      console.log("listing data", data?.result?.listing);
       const {
         id,
         listingTitle,
@@ -84,7 +84,7 @@ export async function GET(
     });
 
   const stream = await ReactPDF.renderToStream(
-    React.createElement(Invoice, { data: itemData })
+    React.createElement(Invoice, { data: itemData }),
   );
 
   return new NextResponse(toWebStream(stream), {
@@ -98,15 +98,15 @@ export async function GET(
 function toWebStream(nodejsStream: NodeJS.ReadableStream): ReadableStream {
   return new ReadableStream({
     start(controller) {
-      nodejsStream.on('data', (chunk) => {
+      nodejsStream.on("data", (chunk) => {
         controller.enqueue(chunk);
       });
-      
-      nodejsStream.on('end', () => {
+
+      nodejsStream.on("end", () => {
         controller.close();
       });
 
-      nodejsStream.on('error', (err) => {
+      nodejsStream.on("error", (err) => {
         controller.error(err);
       });
     },

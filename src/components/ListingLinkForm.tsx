@@ -31,7 +31,7 @@ const formSchema = z.object({
       /[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$/,
       {
         message: "Please provide a valid listing url.",
-      }
+      },
     ),
 });
 
